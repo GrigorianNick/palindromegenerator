@@ -1,6 +1,9 @@
 package main
 
-import "log"
+import (
+	"log"
+	"sync"
+)
 
 type Generator struct {
 }
@@ -28,10 +31,21 @@ func (generator *Generator) findAndInsert(s string) (int, string) {
 	}
 	for i := 0; i < len(s); i++ {
 		if s[i] != s[len(s)-1-i] {
-			frontString := s[:i] + string(rune(s[len(s)-1-i])) + s[i:]
-			backString := s[:len(s)-i] + string(rune(s[i])) + s[len(s)-i:]
-			frontCount, frontResult := generator.findAndInsert(frontString)
-			backCount, backResult := generator.findAndInsert(backString)
+			var frontCount, backCount int
+			var frontResult, backResult string
+			wg := sync.WaitGroup{}
+			wg.Add(2)
+			go func() {
+				defer wg.Done()
+				frontString := s[:i] + string(rune(s[len(s)-1-i])) + s[i:]
+				frontCount, frontResult = generator.findAndInsert(frontString)
+			}()
+			go func() {
+				defer wg.Done()
+				backString := s[:len(s)-i] + string(rune(s[i])) + s[len(s)-i:]
+				backCount, backResult = generator.findAndInsert(backString)
+			}()
+			wg.Wait()
 			if frontCount < backCount {
 				return frontCount + 1, frontResult
 			} else {
@@ -53,5 +67,5 @@ func (generator *Generator) GenerateFrom(s string) (int, string) {
 
 func main() {
 	gen := NewGenerator()
-	log.Println(gen.GenerateFrom("TATTA"))
+	log.Println(gen.GenerateFrom("GOBBLET"))
 }

@@ -5,22 +5,8 @@ import (
 	"sync"
 )
 
-// isPalindrome returns if a string is a palindrome
-func IsPalindrome(s string) bool {
-	for i := 0; i < len(s)/2; i++ {
-		if s[i] != s[len(s)-1-i] {
-			return false
-		}
-	}
-	return true
-}
-
-// findAndInsert finds where the first dangler is, and then tries to insert a
-// rune to fix it
-func findAndInsert(s string) (int, string) {
-	if IsPalindrome(s) {
-		return 0, s
-	}
+// GenerateFrom generates the shortest pallindrome from a string
+func GenerateFrom(s string) (int, string) {
 	for i := 0; i < len(s)/2; i++ {
 		if s[i] != s[len(s)-1-i] {
 			var frontCount, backCount int
@@ -30,12 +16,12 @@ func findAndInsert(s string) (int, string) {
 			go func() {
 				defer wg.Done()
 				frontString := s[:i] + string(rune(s[len(s)-1-i])) + s[i:]
-				frontCount, frontResult = findAndInsert(frontString)
+				frontCount, frontResult = GenerateFrom(frontString)
 			}()
 			go func() {
 				defer wg.Done()
 				backString := s[:len(s)-i] + string(rune(s[i])) + s[len(s)-i:]
-				backCount, backResult = findAndInsert(backString)
+				backCount, backResult = GenerateFrom(backString)
 			}()
 			wg.Wait()
 			if frontCount < backCount {
@@ -45,14 +31,9 @@ func findAndInsert(s string) (int, string) {
 			}
 		}
 	}
-	return -1, s
-}
-
-// GenerateFrom generates the shortest pallindrome from a string
-func GenerateFrom(s string) (int, string) {
-	return findAndInsert(s)
+	return 0, s
 }
 
 func main() {
-	log.Println(GenerateFrom("BLOB"))
+	log.Println(GenerateFrom("GOB"))
 }

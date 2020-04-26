@@ -21,7 +21,7 @@ func findAndInsert(s string) (int, string) {
 	if IsPalindrome(s) {
 		return 0, s
 	}
-	for i := 0; i < len(s); i++ {
+	for i := 0; i < len(s)/2; i++ {
 		if s[i] != s[len(s)-1-i] {
 			var frontCount, backCount int
 			var frontResult, backResult string
@@ -54,5 +54,5 @@ func GenerateFrom(s string) (int, string) {
 }
 
 func main() {
-	log.Println(GenerateFrom("TABABABAcT"))
+	log.Println(GenerateFrom("BLOB"))
 }
